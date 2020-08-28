@@ -1,11 +1,11 @@
 const logger = require('./logger');
-const API_TOKEN = require('./config');
 
 function validateBearerToken(req, res, next) {
-  const authMethod = req.get('Authorization');
+  const apiKey = process.env.API_KEY;
+  const authToken = req.get('Authorization');
+  logger.error('Unauthorized access');
 
-  if (API_TOKEN !== authMethod) {
-    logger.error(`Unauthorized request to path: ${req.path}`);
+  if (!authToken || authToken.split(' ')[1] !== apiKey) {
     return res.status(401).json({ error: 'Unauthorized request' });
   }
   next();

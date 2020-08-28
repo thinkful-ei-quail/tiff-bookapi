@@ -16,53 +16,45 @@ bookmarkRouter.route('/bookmarks')
     res.status(200).json(STORE.bookmarks);
   })
   .post(bodyParser, (req, res) => {
-    const { title, url, description = '', rating } = req.body;
-
+    const { title, url, description, rating } = req.body;
+    
     if (!title) {
       logger.error('Title is required');
       return res.json(400).send('Invalid data');
     }
-    if (!description) {
-      logger.error('Content is required');
-      return res.json(400).send('Invalid data');
-    }
     if (!isWebUri(url)) {
       logger.error(`Invalid url '${url}' supplied`);
-      return res.status(400).send(`'url' must be a valid URL`);
-    }
-    if (!Number.isInteger(rating) || rating < 0 || rating > 5) {
-      logger.error(`Invalid rating '${rating}' supplied`);
-      return res.status(400).send(`'Rrating' must be a number between 0 and 5`);
+      return res.status(400).send('url must be a valid URL');
     }
 
-    const id = uuid();
     const bookmark = {
-      id,
+      id: uuid(),
       title,
       description,
       url,
       rating
     };
 
-    STORE.bookmarks.push(bookmark)
-    logger.info(`Bookmark with ${id} created!`)
-    return res.status(201).location(`http://localhost:8000/list/${id}`).json({ id });
+    STORE.bookmarks.push(bookmark);
+    logger.info(`Bookmark with ${bookmark.id} created!`);
+    res.status(201).location(`http://localhost:8000/bookmarks/${bookmark.id}`).json(bookmark);
   });
 
-bookmarkRouter.route('/bookmarks/:id')
+bookmarkRouter
+  .route('/bookmarks/:id')
   .get((req, res) => {
     const { id } = req.params;
-    const bookmark = STORE.bookmarks.find(book => book.id === id);
+    let bookmark = STORE.bookmarks.findIndex(book => book.id === id);
 
     if (!bookmark) {
       logger.error(`Bookmark with ${id} not found`);
       return res.status(404).send('Bookmark not found');
     }
-    res.json(bookmark);
-})
+    res.status(201).json(bookmark);
+  })
 
   .delete((req, res) => {
-    const { id } = req.params
+    const { id } = req.params;
     const index = STORE.bookmarks.findIndex(book => book.id === id);
 
     if (!index === -1) {
