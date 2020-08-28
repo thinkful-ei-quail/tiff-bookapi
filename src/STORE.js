@@ -1,4 +1,4 @@
-const uuid = require('uuid/v4');
+const {v4: uuid} = require('uuid');
 
 const bookmarks = [
   {
@@ -31,4 +31,4 @@ const bookmarks = [
   }
 ];
 
-module.exports = { bookmarks };
+module.exports = bookmarks;
