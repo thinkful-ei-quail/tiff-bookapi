@@ -7,11 +7,8 @@ const STORE = require('../STORE');
 const bookmarkRouter = express.Router();
 const bodyParser = express.json();
 
-bookmarkRouter.route('/').get((req, res) => {
-  res.status(200).json('it\'s working! :-)');
-});
-
-bookmarkRouter.route('/bookmarks')
+bookmarkRouter
+  .route('/')
   .get((req, res) => {
     res.status(200).json(STORE.bookmarks);
   })
@@ -40,8 +37,10 @@ bookmarkRouter.route('/bookmarks')
     res.status(201).location(`http://localhost:8000/bookmarks/${bookmark.id}`).json(bookmark);
   });
 
+// delete and get id work on postman, but don't work on client
+// buttons register clicks, but aren't connected to functions?
 bookmarkRouter
-  .route('/bookmarks/:id')
+  .route('/:bookmark_id')
   .get((req, res) => {
     const { id } = req.params;
     let bookmark = STORE.bookmarks.findIndex(book => book.id === id);
@@ -50,7 +49,7 @@ bookmarkRouter
       logger.error(`Bookmark with ${id} not found`);
       return res.status(404).send('Bookmark not found');
     }
-    res.status(201).json(bookmark);
+    return res.status(201).json();
   })
 
   .delete((req, res) => {
@@ -63,7 +62,7 @@ bookmarkRouter
     }
     STORE.bookmarks.splice(index, 1);
     logger.info(`Bookmark with id ${id} deleted`);
-    res.status(204).end();
+    return res.status(204).end();
   });
 
 module.exports = bookmarkRouter;
