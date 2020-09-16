@@ -37,8 +37,6 @@ bookmarkRouter
     res.status(201).location(`http://localhost:8000/bookmarks/${bookmark.id}`).json(bookmark);
   });
 
-// delete and get id work on postman, but don't work on client
-// buttons register clicks, but aren't connected to functions?
 bookmarkRouter
   .route('/:bookmark_id')
   .get((req, res) => {
@@ -49,7 +47,7 @@ bookmarkRouter
       logger.error(`Bookmark with ${id} not found`);
       return res.status(404).send('Bookmark not found');
     }
-    return res.status(201).json();
+    return res.json(bookmark);
   })
 
   .delete((req, res) => {
